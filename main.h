@@ -86,6 +86,8 @@ class ChessBoard {
 		bool RookValidMove(int R1,int C1,int R2,int C2);
 		bool BishopValidMove(int R1,int C1,int R2,int C2);
 		bool KnightValidMove(int R1,int C1,int R2,int C2);
+		bool WhiteInCheck();
+		bool BlackInCheck();
 }
 ChessBoard::ChessBoard(){//initializes a board with the whites on top and the blacks on the bottom
 	for(int i=1;i<9;i++){
@@ -370,39 +372,68 @@ bool ChessBoard::KnightValidMove(int R1,int C1,int R2,int C2){
 
 
 
-
-
-
-
 bool ChessBoard::MakeMove(int R1,int C1,int R2,int C2){
 	if((R1-R2)==0&&(C1-C2)==0)
 		return false;
 	if(R1<1||R2<1||C1<1||C2<1||R1>8||R2>8||C1>8||C2>8)
 		return false;
 	num_of_moves++;
-	G_ChessPiecesTypes PieceType1=Board[R1][C1];
-	switch(PieceType1){
-		case King:
-			break;
-		case Queen:
-			break;
-		case Rook:
-			break;
-		case Bishop:
-			break;
-		case Knight:
-			break;
-		case Pawn:
-			break;
-		case Blank:
-			return false;
-			break;
+	if(KnightValidMove(R1,C1,R2,C2)||BishopValidMove(R1,C1,R2,C2)||RookValidMove(R1,C1,R2,C2)||QueenValidMove(R1,C1,R2,C2)||KingValidMove(R1,C1,R2,C2)||PawnValidMove(R1,C1,R2,C2)){//check if it is a valid move
+		Board[R1][C1]=Board[R2][C2];
+		Board[R1][C1]=Blank;
 	}
-	
-	
-	
-	
+}
+
+bool ChessBoard::WhiteInCheck(){
+	//finding the coordinates of the white king
+	int C,R;
+	for(int i=1;i<=8;i++){
+		for(int j=1;j<=8;j++){
+			if(Board[i][j].GetPieceType()==King&&Board[i][j].GetColor()==White){
+				R=i;
+				C=j;
+			}
+		}
+	}
+	//check if anyone can move to where the king is(basically if the king is in check)
+	for(int i=1;i<=8;i++){
+		for(int j=1;j<=8;j++){
+			if(QueenValidMove(i,j,R,C)||PawnValidMove(i,j,R,C)||KnightValidMove(i,j,R,C)||BishopValidMove(i,j,R,C)||RookValidMove(i,j,R,C))
+				return true;
+			if(Board[i][j].GetPieceType()==King&&Board[i][j].GetColor()==Black){
+				if(std::abs(i-R)<=1&&std::abs(j-R)<=1)
+					return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool ChessBoard::BlackInCheck(){
+	//finding the coordinates of the white king
+	int C,R;
+	for(int i=1;i<=8;i++){
+		for(int j=1;j<=8;j++){
+			if(Board[i][j].GetPieceType()==King&&Board[i][j].GetColor()==Black){
+				R=i;
+				C=j;
+			}
+		}
+	}
+	//check if anyone can move to where the king is(basically if the king is in check)
+	for(int i=1;i<=8;i++){
+		for(int j=1;j<=8;j++){
+			if(QueenValidMove(i,j,R,C)||PawnValidMove(i,j,R,C)||KnightValidMove(i,j,R,C)||BishopValidMove(i,j,R,C)||RookValidMove(i,j,R,C))
+				return true;
+			if(Board[i][j].GetPieceType()==King&&Board[i][j].GetColor()==white){
+				if(std::abs(i-R)<=1&&std::abs(j-R)<=1)
+					return true;
+			}
+		}
+	}
+	return false;
 }
 
 
 #endif
+
