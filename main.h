@@ -93,6 +93,7 @@ class ChessBoard{
 		bool BlackInCheckMate();
 		bool IsValidMove(int R1,int C1,int R2, int C2);
 		void PrintChessBoard();
+		std::string GetWhoseTurn();
 };
 ChessBoard::ChessBoard(){//initializes a board with the whites on top and the blacks on the bottom
 	for(int i=1;i<9;i++){
@@ -153,12 +154,9 @@ ChessBoard::ChessBoard(){//initializes a board with the whites on top and the bl
 	}
 
 bool ChessBoard::PawnValidMove(int R1,int C1,int R2,int C2){
-	
 	//check that its in fact a pawn in that place
-	if(Board[R1][C1].GetPieceType()!=Pawn)
+	if(!(Board[R1][C1].GetPieceType()==Pawn))
 		return false;
-	
-	
 	if(std::abs(R1-R2)>2)//check that the move is less than two blocks
 		return false;
 	if(C1-C2!=0){//check for column changes
@@ -180,12 +178,12 @@ bool ChessBoard::PawnValidMove(int R1,int C1,int R2,int C2){
 			return false;
 	}
 	//check that they are moving in the right direction
-	if((R1-R2)<0)
+	if((R2-R1)<0)
 	{
 		if(Board[R1][C1].GetPieceColor()==Black)
 			return false;
 	}
-	if((R1-R2)>0)
+	if((R2-R1)>0)
 	{
 		if(Board[R1][C1].GetPieceColor()==White)
 			return false;
@@ -383,8 +381,9 @@ bool ChessBoard::MakeMove(int R1,int C1,int R2,int C2){
 	if(R1<1||R2<1||C1<1||C2<1||R1>8||R2>8||C1>8||C2>8)
 		return false;
 	if(WhoseTurn==Black){
-		if(BlackInCheckMate())
+		if(BlackInCheckMate()){
 			return false;
+		}
 	}
 	if(WhoseTurn==White){
 		if(WhiteInCheckMate())
@@ -469,6 +468,8 @@ bool ChessBoard::BlackInCheck(){
 
 bool ChessBoard::IsValidMove(int R1,int C1,int R2, int C2){
 	if(Board[R1][C1].GetPieceColor()==White){
+		
+		
 		if(KnightValidMove(R1,C1,R2,C2)||BishopValidMove(R1,C1,R2,C2)||RookValidMove(R1,C1,R2,C2)||QueenValidMove(R1,C1,R2,C2)||KingValidMove(R1,C1,R2,C2)||PawnValidMove(R1,C1,R2,C2)){
 			ChessPiece R1_C1_Piece=Board[R1][C1];
 			ChessPiece R2_C2_Piece=Board[R2][C2];
@@ -589,6 +590,13 @@ void ChessBoard::PrintChessBoard(){
 		}
 		std::cout<<std::endl;
 	}
+}
+
+std::string ChessBoard::GetWhoseTurn(){
+	if(WhoseTurn==White)
+		return "white";
+	else
+		return "black";
 }
 #endif
 
