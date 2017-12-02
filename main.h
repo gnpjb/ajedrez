@@ -22,13 +22,13 @@ class ChessPiece {
 			PieceType=SettingColor;					//set the piece color
 		}
 		G_ChessPiecesTypes GetPieceType(){return PieceType;}						//returns the piece type
-		G_ChessPiecesColors GetColor(){return PieceColor;}						//returns the piece color
+		G_ChessPiecesColors GetPieceColor(){return PieceColor;}						//returns the piece color
 		string String_GetPieceType();												//returns the type in a string
-		string String_GetColor();											//returns the color in a string
+		string String_GetPieceColor();											//returns the color in a string
 };
 
 //ChessPiece Function declarations
-std::string ChessPiece::String_GetColor(){//returns a string with the color of the piece
+std::string ChessPiece::String_GetPieceColor(){//returns a string with the color of the piece
 	switch(PieceColor){
 		case White:
 			return "White";
@@ -75,6 +75,7 @@ switch(PieceType){
 
 class ChessBoard {
 	protected:
+		G_ChessPiecesColors WhoseTurn=White;
 		int num_of_moves=0;
 		ChessPiece Board[8][8];
 	public:
@@ -88,6 +89,10 @@ class ChessBoard {
 		bool KnightValidMove(int R1,int C1,int R2,int C2);
 		bool WhiteInCheck();
 		bool BlackInCheck();
+		bool WhiteInCheckMate();
+		bool BlackInCheckMate();
+		bool IsValidMove(int R1,int C1,int R2, int C2);
+		void PrintChessBoard();
 }
 ChessBoard::ChessBoard(){//initializes a board with the whites on top and the blacks on the bottom
 	for(int i=1;i<9;i++){
@@ -159,30 +164,30 @@ bool ChessBoard::PawnValidMove(int R1,int C1,int R2,int C2){
 	if(C1-C2!=0){//check for column changes
 		if(std::abs(R1-R2)!=1)
 			return false;
-		if(Board[R1][C1].GetColor()==White)
+		if(Board[R1][C1].GetPieceColor()==White)
 		{	//check to see if the move is to a blank spot or a a piece of the same color
-			if((Board[R2][C2].GetPieceType==Blank)||(Board.[R2][C2].GetColor==White))
+			if((Board[R2][C2].GetPieceType==Blank)||(Board.[R2][C2].GetPieceColor==White))
 				return false;
 		}
 		else
 		{	//check to see if the move is to a blank spot or a a piece of the same color
-			if((Board[R2][C2].GetPieceType==Blank)||(Board.[R2][C2].GetColor==Black))
+			if((Board[R2][C2].GetPieceType==Blank)||(Board.[R2][C2].GetPieceColor==Black))
 				return false;
 		}
 	}
 	if(std::abs(R1-R2)==2){//check for the special case of the first time they move
-		if(!((R1==2&&Board[R1][C1].GetColor()==White)||(R1==7&&Board[R1][C1].GetColor()==Black)))
+		if(!((R1==2&&Board[R1][C1].GetPieceColor()==White)||(R1==7&&Board[R1][C1].GetPieceColor()==Black)))
 			return false;
 	}
 	//check that they are moving in the right direction
 	if((R1-R2)<0)
 	{
-		if(Board[R1][C1].GetColor()==Black)
+		if(Board[R1][C1].GetPieceColor()==Black)
 			return false;
 	}
 	if((R1-R2)>0)
 	{
-		if(Board[R1][C1].GetColor()==White)
+		if(Board[R1][C1].GetPieceColor()==White)
 			return false;
 	}
 	{
@@ -214,12 +219,12 @@ bool ChessBoard::KingValidMove(int R1,int C1,int R2,int C2){
 	//check that the move is in the king range of movement
 	if((std::abs(R1-R2))>1||(std::abs(C1-C2))>1)
 		return false;
-	if(!((Board[R2][C2].GetPieceType()==Blank)||(Board[R2][C2].GetColor()!=Board[R1][C1])))
+	if(!((Board[R2][C2].GetPieceType()==Blank)||(Board[R2][C2].GetPieceColor()!=Board[R1][C1])))
 		return false;
 	//check that the king doesnt get into a check
 	for(int i=1;i<=8;i++){
 		for(int j;j<=8;i++){
-			if((!(Board[i][j].GetPieceType()==Blank||(i==R1&&j==C1)))&&(Board[i][j].GetColor()!=Board[R1][C1].GetColor()))
+			if((!(Board[i][j].GetPieceType()==Blank||(i==R1&&j==C1)))&&(Board[i][j].GetPieceColor()!=Board[R1][C1].GetPieceColor()))
 			{
 				
 				if(//check if Board[i][j] can move to where the king will be
@@ -273,7 +278,7 @@ bool ChessBoard::QueenValidMove(int R1,int C1,int R2,int C2){
 				return false;
 		}
 	}
-	if(Board[R2][C2].GetColor==Board[R1][C1].GetColor&&Board[R2][C2]!=Blank)
+	if(Board[R2][C2].GetPieceColor==Board[R1][C1].GetPieceColor&&Board[R2][C2]!=Blank)
 		return false;
 	return true;
 }
@@ -309,7 +314,7 @@ bool ChessBoard::RookValidMove(int R1,int C1,int R2,int C2){
 		}
 	}
 	
-	if(Board[R2][C2].GetColor==Board[R1][C1].GetColor&&Board[R2][C2]!=Blank)//check that the space is blank or eatable
+	if(Board[R2][C2].GetPieceColor==Board[R1][C1].GetPieceColor&&Board[R2][C2]!=Blank)//check that the space is blank or eatable
 		return false;	
 	
 	return true;
@@ -346,7 +351,7 @@ bool ChessBoard::BishopValidMove(int R1,int C1,int R2,int C2){
 			}
 	}
 	
-	if(Board[R2][C2].GetColor==Board[R1][C1].GetColor&&Board[R2][C2]!=Blank)//check that the space is blank or eatable
+	if(Board[R2][C2].GetPieceColor==Board[R1][C1].GetPieceColor&&Board[R2][C2]!=Blank)//check that the space is blank or eatable
 		return false;
 	return true;
 }
@@ -364,7 +369,7 @@ bool ChessBoard::KnightValidMove(int R1,int C1,int R2,int C2){
 		&&((std::abs(R1-R2)+std::abs(C1-C2))==3)
 	))
 		return false;
-	if(Board[R2][C2].GetColor==Board[R1][C1].GetColor&&Board[R2][C2]!=Blank)//check that the space is blank or eatable
+	if(Board[R2][C2].GetPieceColor==Board[R1][C1].GetPieceColor&&Board[R2][C2]!=Blank)//check that the space is blank or eatable
 		return false;
 	
 	return true;
@@ -377,11 +382,39 @@ bool ChessBoard::MakeMove(int R1,int C1,int R2,int C2){
 		return false;
 	if(R1<1||R2<1||C1<1||C2<1||R1>8||R2>8||C1>8||C2>8)
 		return false;
-	num_of_moves++;
-	if(KnightValidMove(R1,C1,R2,C2)||BishopValidMove(R1,C1,R2,C2)||RookValidMove(R1,C1,R2,C2)||QueenValidMove(R1,C1,R2,C2)||KingValidMove(R1,C1,R2,C2)||PawnValidMove(R1,C1,R2,C2)){//check if it is a valid move
-		Board[R1][C1]=Board[R2][C2];
-		Board[R1][C1]=Blank;
+	if(WhoseTurn==Black){
+		if(BlackInCheckMate())
+			return false;
 	}
+	if(WhoseTurn==White){
+		if(WhiteInCheckMate())
+			return false;
+	}
+	if(Board[R1][C1].GetPieceColor()!=WhoseTurn)
+		return false;
+	if(IsValidMove(R1,C1,R2,C2)){//check if it is a valid move
+		ChessPiece Tmp_P1=Board[R1][C1];
+		ChessPiece Tmp_P2=Board[R2][C2];
+		Board[R2][C2]=Board[R1][C1];
+		Board[R1][C1].SetPieceType(Blank);
+		if(WhoseTurn==White&&WhiteInCheck()){
+			Board[R1][C1]=Tmp_P1;
+			Board[R2][C2]=Tmp_P2;
+			return false;
+		}
+		if(WhoseTurn==Black&&BlackInCheck()){
+			Board[R1][C1]=Tmp_P1;
+			Board[R2][C2]=Tmp_P2;
+			return false;
+		}
+		num_of_moves++;
+		if(WhoseTurn==White)
+			WhoseTurn=Black;
+		else
+			WhoseTurn=White;
+	}
+	else
+		return false;
 }
 
 bool ChessBoard::WhiteInCheck(){
@@ -389,7 +422,7 @@ bool ChessBoard::WhiteInCheck(){
 	int C,R;
 	for(int i=1;i<=8;i++){
 		for(int j=1;j<=8;j++){
-			if(Board[i][j].GetPieceType()==King&&Board[i][j].GetColor()==White){
+			if(Board[i][j].GetPieceType()==King&&Board[i][j].GetPieceColor()==White){
 				R=i;
 				C=j;
 			}
@@ -400,7 +433,7 @@ bool ChessBoard::WhiteInCheck(){
 		for(int j=1;j<=8;j++){
 			if(QueenValidMove(i,j,R,C)||PawnValidMove(i,j,R,C)||KnightValidMove(i,j,R,C)||BishopValidMove(i,j,R,C)||RookValidMove(i,j,R,C))
 				return true;
-			if(Board[i][j].GetPieceType()==King&&Board[i][j].GetColor()==Black){
+			if(Board[i][j].GetPieceType()==King&&Board[i][j].GetPieceColor()==Black){
 				if(std::abs(i-R)<=1&&std::abs(j-R)<=1)
 					return true;
 			}
@@ -414,7 +447,7 @@ bool ChessBoard::BlackInCheck(){
 	int C,R;
 	for(int i=1;i<=8;i++){
 		for(int j=1;j<=8;j++){
-			if(Board[i][j].GetPieceType()==King&&Board[i][j].GetColor()==Black){
+			if(Board[i][j].GetPieceType()==King&&Board[i][j].GetPieceColor()==Black){
 				R=i;
 				C=j;
 			}
@@ -425,7 +458,7 @@ bool ChessBoard::BlackInCheck(){
 		for(int j=1;j<=8;j++){
 			if(QueenValidMove(i,j,R,C)||PawnValidMove(i,j,R,C)||KnightValidMove(i,j,R,C)||BishopValidMove(i,j,R,C)||RookValidMove(i,j,R,C))
 				return true;
-			if(Board[i][j].GetPieceType()==King&&Board[i][j].GetColor()==white){
+			if(Board[i][j].GetPieceType()==King&&Board[i][j].GetPieceColor()==white){
 				if(std::abs(i-R)<=1&&std::abs(j-R)<=1)
 					return true;
 			}
@@ -434,6 +467,125 @@ bool ChessBoard::BlackInCheck(){
 	return false;
 }
 
+bool ChessBoard::IsValidMove(int R1,int C1,int R2, int C2){
+	if(Board[R1][C1].GetPieceColor()==White){
+		if(KnightValidMove(R1,C1,R2,C2)||BishopValidMove(R1,C1,R2,C2)||RookValidMove(R1,C1,R2,C2)||QueenValidMove(R1,C1,R2,C2)||KingValidMove(R1,C1,R2,C2)||PawnValidMove(R1,C1,R2,C2)){
+			ChessPiece R1_C1_Piece=Board[R1][C1];
+			ChessPiece R2_C2_Piece=Board[R2][C2];
+			Board[R2][C2]=Board[R1][C1];
+			Board[R1][C1].SetPieceType(Blank);
+			if(WhiteInCheck()){
+				Board[R1][C1]= R1_C1_Piece;
+				Board[R2][C2]=R2_C2_Piece;
+				return false;
+			}
+		}
+			
+	}
+	if(Board[R1][C1].GetPieceColor()==Black){
+		if(KnightValidMove(R1,C1,R2,C2)||BishopValidMove(R1,C1,R2,C2)||RookValidMove(R1,C1,R2,C2)||QueenValidMove(R1,C1,R2,C2)||KingValidMove(R1,C1,R2,C2)||PawnValidMove(R1,C1,R2,C2)){
+			ChessPiece R1_C1_Piece=Board[R1][C1];
+			ChessPiece R2_C2_Piece=Board[R2][C2];
+			Board[R2][C2]=Board[R1][C1];
+			if(BlackInCheck()){
+				Board[R1][C1]= R1_C1_Piece;
+				Board[R2][C2]=R2_C2_Piece;
+				return false;
+			}
+		}
+		
+	}
+	
+}
+bool ChessBoard::BlackInCheckMate(){//checks if black is in checkmate
+	if(!BlackInCheck())//if its not in check already it can never be in checkmate
+		return false;
+	for(int i=1;i<=8;i++){//go throught all the pieces,check if they are black, then move them temporarily and see if it is still in check, if not, return false
+		for(int j=1;j<=8;j++){
+			if(Board[i][j].GetPieceType()==Blank)
+				continue;
+			if(Board[i][j].GetPieceColor()==Black){
+				for(int k=1;k<=8;k++){
+					for(int l=1;l<=1;l++){
+						if(IsValidMove(i,j,k,l))
+						{
+							ChessPiece i_j_Piece=Board[i][j];
+							ChessPiece k_l_Piece=Board[k][l];
+							Board[k][l]=Board[i][j];
+							Board[i][j].SetPieceType(Blank);
+							if(!BlackInCheck()){
+								Board[i][j]=i_j_Piece;
+								Board[k][l]=k_l_Piece;
+								return false;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+bool ChessBoard::WhiteInCheckMate(){//checks if white is in checkmate
+	if(!WhiteInCheck())//if its not in check already it can never be in checkmate
+		return false;
+	for(int i=1;i<=8;i++){//go throught all the pieces,check if they are white, then move them temporarily and see if it is still in check, if not, return false
+		for(int j=1;j<=8;j++){
+			if(Board[i][j].GetPieceType()==Blank)
+				continue;
+			if(Board[i][j].GetPieceColor()==White){
+				for(int k=1;k<=8;k++){
+					for(int l=1;l<=1;l++){
+						if(IsValidMove(i,j,k,l))
+						{
+							ChessPiece i_j_Piece=Board[i][j];
+							ChessPiece k_l_Piece=Board[k][l];
+							Board[k][l]=Board[i][j];
+							Board[i][j].SetPieceType(Blank);
+							if(!BlackInCheck()){
+								Board[i][j]=i_j_Piece;
+								Board[k][l]=k_l_Piece;
+								return false;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
 
+
+void ChessBoard::PrintChessBoard(){
+	for(int i=1;i<=8;i++){
+		for(int j=1;j<=8;j++){
+			if(Board[i][j].GetPieceColor==White)
+				std::cout<<"W";
+			switch(Board[i][j].GetPieceType()){
+				case King:
+					std::cout<<"Ki ";
+					break;
+				case Rook:
+					std::cout<<"Ro ";
+					break;
+				case Knight:
+					std::cout<<"Kn ";
+					break;
+				case Bishop:
+					std::cout<<"Bi ";
+					break;
+				case Blank:
+					std::cout<<"Bl ";
+					break;
+				case Queen:
+					std::cout<<"Qu ";
+					break;
+				case Pawn:
+					std::cout<<"Pa ";
+					break;
+			}
+			std::cout<<std::endl;
+		}
+	}
+}
 #endif
 
