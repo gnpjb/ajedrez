@@ -19,12 +19,12 @@ class ChessPiece {
 			PieceType=SettingType;
 		} //set which type of piece it is
 		void SetPieceColor(G_ChessPiecesColors SettingColor){
-			PieceType=SettingColor;					//set the piece color
+			PieceColor=SettingColor;					//set the piece color
 		}
 		G_ChessPiecesTypes GetPieceType(){return PieceType;}						//returns the piece type
 		G_ChessPiecesColors GetPieceColor(){return PieceColor;}						//returns the piece color
-		string String_GetPieceType();												//returns the type in a string
-		string String_GetPieceColor();											//returns the color in a string
+		std::string String_GetPieceType();												//returns the type in a string
+		std::string String_GetPieceColor();											//returns the color in a string
 };
 
 //ChessPiece Function declarations
@@ -73,14 +73,14 @@ switch(PieceType){
 
 
 
-class ChessBoard {
+class ChessBoard{
 	protected:
 		G_ChessPiecesColors WhoseTurn=White;
 		int num_of_moves=0;
 		ChessPiece Board[8][8];
 	public:
 		ChessBoard();
-		bool MakeMove();
+		bool MakeMove(int R1,int C1,int R2,int C2);
 		bool PawnValidMove(int R1,int C1,int R2,int C2);
 		bool KingValidMove(int R1,int C1,int R2,int C2);
 		bool QueenValidMove(int R1,int C1,int R2,int C2);
@@ -93,7 +93,7 @@ class ChessBoard {
 		bool BlackInCheckMate();
 		bool IsValidMove(int R1,int C1,int R2, int C2);
 		void PrintChessBoard();
-}
+};
 ChessBoard::ChessBoard(){//initializes a board with the whites on top and the blacks on the bottom
 	for(int i=1;i<9;i++){
 		if(i==1||i==2||i==7||i==8){
@@ -166,12 +166,12 @@ bool ChessBoard::PawnValidMove(int R1,int C1,int R2,int C2){
 			return false;
 		if(Board[R1][C1].GetPieceColor()==White)
 		{	//check to see if the move is to a blank spot or a a piece of the same color
-			if((Board[R2][C2].GetPieceType==Blank)||(Board.[R2][C2].GetPieceColor==White))
+			if((Board[R2][C2].GetPieceType()==Blank)||(Board[R2][C2].GetPieceColor()==White))
 				return false;
 		}
 		else
 		{	//check to see if the move is to a blank spot or a a piece of the same color
-			if((Board[R2][C2].GetPieceType==Blank)||(Board.[R2][C2].GetPieceColor==Black))
+			if((Board[R2][C2].GetPieceType()==Blank)||(Board[R2][C2].GetPieceColor()==Black))
 				return false;
 		}
 	}
@@ -219,7 +219,7 @@ bool ChessBoard::KingValidMove(int R1,int C1,int R2,int C2){
 	//check that the move is in the king range of movement
 	if((std::abs(R1-R2))>1||(std::abs(C1-C2))>1)
 		return false;
-	if(!((Board[R2][C2].GetPieceType()==Blank)||(Board[R2][C2].GetPieceColor()!=Board[R1][C1])))
+	if(!((Board[R2][C2].GetPieceType()==Blank)||(Board[R2][C2].GetPieceColor()!=Board[R1][C1].GetPieceColor())))
 		return false;
 	//check that the king doesnt get into a check
 	for(int i=1;i<=8;i++){
@@ -228,11 +228,11 @@ bool ChessBoard::KingValidMove(int R1,int C1,int R2,int C2){
 			{
 				
 				if(//check if Board[i][j] can move to where the king will be
-					Board[i][j].PawnValidMove(i,j,R2,C2)
-					||Board[i][j].RookValidMove(i,j,R2,C2)
-					||Board[i][j].KnightValidMove(i,j,R2,C2)
-					||Board[i][j].BishopValidMove(i,j,R2,C2)
-					||Board[i][j].QueenValidMove(i,j,R2,C2)
+					PawnValidMove(i,j,R2,C2)
+					||RookValidMove(i,j,R2,C2)
+					||KnightValidMove(i,j,R2,C2)
+					||BishopValidMove(i,j,R2,C2)
+					||QueenValidMove(i,j,R2,C2)
 				)
 					return false;
 				if(Board[i][j].GetPieceType()==King)
@@ -278,7 +278,7 @@ bool ChessBoard::QueenValidMove(int R1,int C1,int R2,int C2){
 				return false;
 		}
 	}
-	if(Board[R2][C2].GetPieceColor==Board[R1][C1].GetPieceColor&&Board[R2][C2]!=Blank)
+	if(Board[R2][C2].GetPieceColor()==Board[R1][C1].GetPieceColor()&&Board[R2][C2].GetPieceType()!=Blank)
 		return false;
 	return true;
 }
@@ -314,7 +314,7 @@ bool ChessBoard::RookValidMove(int R1,int C1,int R2,int C2){
 		}
 	}
 	
-	if(Board[R2][C2].GetPieceColor==Board[R1][C1].GetPieceColor&&Board[R2][C2]!=Blank)//check that the space is blank or eatable
+	if(Board[R2][C2].GetPieceColor()==Board[R1][C1].GetPieceColor()&&Board[R2][C2].GetPieceType()!=Blank)//check that the space is blank or eatable
 		return false;	
 	
 	return true;
@@ -351,7 +351,7 @@ bool ChessBoard::BishopValidMove(int R1,int C1,int R2,int C2){
 			}
 	}
 	
-	if(Board[R2][C2].GetPieceColor==Board[R1][C1].GetPieceColor&&Board[R2][C2]!=Blank)//check that the space is blank or eatable
+	if(Board[R2][C2].GetPieceColor()==Board[R1][C1].GetPieceColor()&&Board[R2][C2].GetPieceType()!=Blank)//check that the space is blank or eatable
 		return false;
 	return true;
 }
@@ -369,7 +369,7 @@ bool ChessBoard::KnightValidMove(int R1,int C1,int R2,int C2){
 		&&((std::abs(R1-R2)+std::abs(C1-C2))==3)
 	))
 		return false;
-	if(Board[R2][C2].GetPieceColor==Board[R1][C1].GetPieceColor&&Board[R2][C2]!=Blank)//check that the space is blank or eatable
+	if(Board[R2][C2].GetPieceColor()==Board[R1][C1].GetPieceColor()&&Board[R2][C2].GetPieceType()!=Blank)//check that the space is blank or eatable
 		return false;
 	
 	return true;
@@ -458,7 +458,7 @@ bool ChessBoard::BlackInCheck(){
 		for(int j=1;j<=8;j++){
 			if(QueenValidMove(i,j,R,C)||PawnValidMove(i,j,R,C)||KnightValidMove(i,j,R,C)||BishopValidMove(i,j,R,C)||RookValidMove(i,j,R,C))
 				return true;
-			if(Board[i][j].GetPieceType()==King&&Board[i][j].GetPieceColor()==white){
+			if(Board[i][j].GetPieceType()==King&&Board[i][j].GetPieceColor()==White){
 				if(std::abs(i-R)<=1&&std::abs(j-R)<=1)
 					return true;
 			}
@@ -558,8 +558,14 @@ bool ChessBoard::WhiteInCheckMate(){//checks if white is in checkmate
 void ChessBoard::PrintChessBoard(){
 	for(int i=1;i<=8;i++){
 		for(int j=1;j<=8;j++){
-			if(Board[i][j].GetPieceColor==White)
+			if(Board[i][j].GetPieceType()==Blank){
+				std::cout<<"bla ";
+				continue;
+			}
+			if(Board[i][j].GetPieceColor()==White)
 				std::cout<<"W";
+			if(Board[i][j].GetPieceColor()==Black)
+				std::cout<<"B";
 			switch(Board[i][j].GetPieceType()){
 				case King:
 					std::cout<<"Ki ";
@@ -573,9 +579,6 @@ void ChessBoard::PrintChessBoard(){
 				case Bishop:
 					std::cout<<"Bi ";
 					break;
-				case Blank:
-					std::cout<<"Bl ";
-					break;
 				case Queen:
 					std::cout<<"Qu ";
 					break;
@@ -583,8 +586,8 @@ void ChessBoard::PrintChessBoard(){
 					std::cout<<"Pa ";
 					break;
 			}
-			std::cout<<std::endl;
 		}
+		std::cout<<std::endl;
 	}
 }
 #endif
