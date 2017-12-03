@@ -178,19 +178,19 @@ bool ChessBoard::PawnValidMove(int R1,int C1,int R2,int C2){
 			return false;
 	}
 	//check that they are moving in the right direction
-	if((R2-R1)<0)
+	if((R2-R1)>0)
 	{
 		if(Board[R1][C1].GetPieceColor()==Black)
 			return false;
 	}
-	if((R2-R1)>0)
+	if((R2-R1)<0)
 	{
 		if(Board[R1][C1].GetPieceColor()==White)
 			return false;
 	}
 	{
 		int Dir;//direction of move
-		if((R1-R2)<0)
+		if((R1-R2)>0)
 			Dir=(-1);
 		else
 			Dir=1;	
