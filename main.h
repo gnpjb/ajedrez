@@ -220,8 +220,8 @@ bool ChessBoard::KingValidMove(int R1,int C1,int R2,int C2){
 	if(!((Board[R2][C2].GetPieceType()==Blank)||(Board[R2][C2].GetPieceColor()!=Board[R1][C1].GetPieceColor())))
 		return false;
 	//check that the king doesnt get into a check
-	for(int i=1;i<=8;i++){
-		for(int j;j<=8;i++){
+/*	for(int i=1;i<=8;i++){
+		for(int j;j<=8;j++){
 			if((!(Board[i][j].GetPieceType()==Blank||(i==R1&&j==C1)))&&(Board[i][j].GetPieceColor()!=Board[R1][C1].GetPieceColor()))
 			{
 				
@@ -241,6 +241,21 @@ bool ChessBoard::KingValidMove(int R1,int C1,int R2,int C2){
 			}
 		}
 		
+	}
+	changed implemetation
+	*/
+	{
+		bool GetsInCheck=false;
+		ChessPiece Tmp_R1_C1=Board[R1][C1];
+		ChessPiece Tmp_R2_C2=Board[R2][C2];
+		Board[R2][C2]=Board[R1][C1];
+		Board[R2][C2].SetPieceType(Blank);
+		if(Tmp_R1_C1.GetPieceColor()==White&&WhiteInCheck())
+			GetsInCheck=true;
+		if(Tmp_R1_C1.GetPieceColor()==Black&&BlackInCheck())
+			GetsInCheck=true;
+		Board[R1][C1]=Tmp_R1_C1;
+		Board[R2][C2]=Tmp_R2_C2
 	}
 	return true;
 }
@@ -262,11 +277,11 @@ bool ChessBoard::QueenValidMove(int R1,int C1,int R2,int C2){
 		int Dir_C=1;
 		if((R1-R2)==0)
 			Dir_R=0;
-		if((R1-R2)<0)
+		if((R1-R2)>0)
 			Dir_R=-1;
 		if((C1-C2)==0)
 			Dir_C=0;
-		if((C1-C2)<0)
+		if((C1-C2)>0)
 			Dir_C=-1;
 		int Mov=std::abs(R1-R2);//number of moves.(R1-R2) is put there so one less if is needed
 		if(std::abs(R1-R2)<std::abs(C1-C2))
@@ -325,6 +340,8 @@ bool ChessBoard::BishopValidMove(int R1,int C1,int R2,int C2){
 	//check that its in fact a bishop in that place
 	if(Board[R1][C1].GetPieceType()!=Bishop)
 		return false;
+	if(R1==R2||C1==2)//has to move in both R and C
+		return false;
 	
 	//check that the move is in the Bishop range of movement
 	if(!(std::abs(R1-R2)==std::abs(C1-C2)))
@@ -334,11 +351,11 @@ bool ChessBoard::BishopValidMove(int R1,int C1,int R2,int C2){
 		int Dir_C=1;
 		if((R1-R2)==0)
 			Dir_R=0;
-		if((R1-R2)<0)
+		if((R1-R2)>0)
 			Dir_R=-1;
 		if((C1-C2)==0)
 			Dir_C=0;
-		if((C1-C2)<0)
+		if((C1-C2)>0)
 			Dir_C=-1;
 		int Mov=std::abs(R1-R2);//number of moves.(R1-R2) is put there so one less if is needed
 		if(std::abs(R1-R2)<std::abs(C1-C2))
@@ -391,6 +408,8 @@ bool ChessBoard::MakeMove(int R1,int C1,int R2,int C2){
 	}
 	if(Board[R1][C1].GetPieceColor()!=WhoseTurn)
 		return false;
+	if(Board[R1][C1].GetPieceType()==Blank)
+		return false;
 	if(IsValidMove(R1,C1,R2,C2)){//check if it is a valid move
 		ChessPiece Tmp_P1=Board[R1][C1];
 		ChessPiece Tmp_P2=Board[R2][C2];
@@ -414,6 +433,7 @@ bool ChessBoard::MakeMove(int R1,int C1,int R2,int C2){
 	}
 	else
 		return false;
+	return true;
 }
 
 bool ChessBoard::WhiteInCheck(){
@@ -424,8 +444,10 @@ bool ChessBoard::WhiteInCheck(){
 			if(Board[i][j].GetPieceType()==King&&Board[i][j].GetPieceColor()==White){
 				R=i;
 				C=j;
+				break;
 			}
 		}
+		
 	}
 	//check if anyone can move to where the king is(basically if the king is in check)
 	for(int i=1;i<=8;i++){
@@ -449,6 +471,7 @@ bool ChessBoard::BlackInCheck(){
 			if(Board[i][j].GetPieceType()==King&&Board[i][j].GetPieceColor()==Black){
 				R=i;
 				C=j;
+				break;
 			}
 		}
 	}
@@ -480,10 +503,13 @@ bool ChessBoard::IsValidMove(int R1,int C1,int R2, int C2){
 				Board[R2][C2]=R2_C2_Piece;
 				return false;
 			}
+			Board[R1][C1]= R1_C1_Piece;
+			Board[R2][C2]=R2_C2_Piece;
+			return true
 		}
 			
 	}
-	if(Board[R1][C1].GetPieceColor()==Black){
+	else if(Board[R1][C1].GetPieceColor()==Black){
 		if(KnightValidMove(R1,C1,R2,C2)||BishopValidMove(R1,C1,R2,C2)||RookValidMove(R1,C1,R2,C2)||QueenValidMove(R1,C1,R2,C2)||KingValidMove(R1,C1,R2,C2)||PawnValidMove(R1,C1,R2,C2)){
 			ChessPiece R1_C1_Piece=Board[R1][C1];
 			ChessPiece R2_C2_Piece=Board[R2][C2];
@@ -493,8 +519,10 @@ bool ChessBoard::IsValidMove(int R1,int C1,int R2, int C2){
 				Board[R2][C2]=R2_C2_Piece;
 				return false;
 			}
+			Board[R1][C1]= R1_C1_Piece;
+			Board[R2][C2]=R2_C2_Piece;
+			return true;
 		}
-		
 	}
 	
 }
@@ -519,6 +547,9 @@ bool ChessBoard::BlackInCheckMate(){//checks if black is in checkmate
 								Board[k][l]=k_l_Piece;
 								return false;
 							}
+							Board[i][j]=i_j_Piece;
+							Board[k][l]=k_l_Piece;
+							return true;
 						}
 					}
 				}
@@ -547,6 +578,9 @@ bool ChessBoard::WhiteInCheckMate(){//checks if white is in checkmate
 								Board[k][l]=k_l_Piece;
 								return false;
 							}
+							Board[i][j]=i_j_Piece;
+							Board[k][l]=k_l_Piece;
+							return true;
 						}
 					}
 				}
