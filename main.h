@@ -255,7 +255,7 @@ bool ChessBoard::KingValidMove(int R1,int C1,int R2,int C2){
 		if(Tmp_R1_C1.GetPieceColor()==Black&&BlackInCheck())
 			GetsInCheck=true;
 		Board[R1][C1]=Tmp_R1_C1;
-		Board[R2][C2]=Tmp_R2_C2
+		Board[R2][C2]=Tmp_R2_C2;
 	}
 	return true;
 }
@@ -505,7 +505,7 @@ bool ChessBoard::IsValidMove(int R1,int C1,int R2, int C2){
 			}
 			Board[R1][C1]= R1_C1_Piece;
 			Board[R2][C2]=R2_C2_Piece;
-			return true
+			return true;
 		}
 			
 	}
