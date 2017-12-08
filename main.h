@@ -101,8 +101,6 @@ class ChessBoard{
 		G_ChessPiecesColors WhoseTurn=White;
 		int num_of_moves=0;
 		ChessPiece Board[8][8];
-		SDL_Surface* S_Pieces[8][8];
-		SDL_Surface* S_Background;
 		SDL_Surface* S_Screen;
 		SDL_Window* Window;
 		bool Initialized=false;
@@ -181,11 +179,7 @@ ChessBoard::ChessBoard(){//initializes a board with the whites on top and the bl
 		}
 	}
 	//SDL
-	for(int i=1;i<=8;i++){//nullify all pointers
-		for(int j=1;j<=8;j++){
-			S_Pieces[i][j]=NULL;
-		}
-	}
+	SDL_Surface *S_Background;
 	S_Background=NULL;
 	S_Screen=NULL;
 	Window=NULL;
@@ -207,19 +201,17 @@ ChessBoard::ChessBoard(){//initializes a board with the whites on top and the bl
 	);
 	if(Window==NULL)
 		Initialized=false;
-	S_Screen=SDL_GetWindowSurface(Window);
-	S_Background=SDL_LoadBMP("images/ChessBoard.bmp");
-	SDL_BlitSurface(S_Background,NULL,S_Screen,NULL);
-	SDL_UpdateWindowSurface(Window);
-}
-ChessBoard::~ChessBoard(){
-	for(int i=1;i<=8;i++){//nullify all pointers
-		for(int j=1;j<=8;j++){
-			SDL_FreeSurface(S_Pieces[i][j]);
-		}
+	if(Window!=NULL){
+		S_Screen=SDL_GetWindowSurface(Window);
+		S_Background=SDL_LoadBMP("images/ChessBoard.bmp");
+		SDL_BlitSurface(S_Background,NULL,S_Screen,NULL);
+		SDL_UpdateWindowSurface(Window);
 	}
 	SDL_FreeSurface(S_Background);
+}
+ChessBoard::~ChessBoard(){
 	SDL_FreeSurface(S_Screen);
+	SDL_DestroyWindow(Window);
 	SDL_Quit();
 }
 
@@ -714,72 +706,62 @@ std::string ChessBoard::GetWhoseTurn(){
 //sdl part:
 
 void ChessBoard::UpdateScreen(){
-	//MISSING:this function should update de the surfaces and windows so that they display de current state of the board
+	SDL_Surface* S_Piece=NULL;
+	SDL_Rect Rect;
 	for(int i=1;i<=8;i++){//put the correct image in each surface
 		for(int j=1;j<=8;j++){
 			switch(Board[i][j].GetPieceType()){
 				case Rook:
 					if(Board[i][j].GetPieceColor()==White)
-						S_Pieces[i][j]=SDL_LoadBMP("images/WhiteRook.bmp");
+						S_Piece=SDL_LoadBMP("images/WhiteRook.bmp");
 					else
-						S_Pieces[i][j]=SDL_LoadBMP("images/BlackRook.bmp");
+						S_Piece=SDL_LoadBMP("images/BlackRook.bmp");
 					break;
 				case King:
 					if(Board[i][j].GetPieceColor()==White)
-						S_Pieces[i][j]=SDL_LoadBMP("images/WhiteKing.bmp");
+						S_Piece=SDL_LoadBMP("images/WhiteKing.bmp");
 					else
-						S_Pieces[i][j]=SDL_LoadBMP("images/BlackKing.bmp");
+						S_Piece=SDL_LoadBMP("images/BlackKing.bmp");
 					break;
 				case Bishop:
 					if(Board[i][j].GetPieceColor()==White)
-						S_Pieces[i][j]=SDL_LoadBMP("images/WhiteBishop.bmp");
+						S_Piece=SDL_LoadBMP("images/WhiteBishop.bmp");
 					else
-						S_Pieces[i][j]=SDL_LoadBMP("images/BlackBishop.bmp");
+						S_Piece=SDL_LoadBMP("images/BlackBishop.bmp");
 					break;
 				case Queen:
 					if(Board[i][j].GetPieceColor()==White)
-						S_Pieces[i][j]=SDL_LoadBMP("images/WhiteQueen.bmp");
+						S_Piece=SDL_LoadBMP("images/WhiteQueen.bmp");
 					else
-						S_Pieces[i][j]=SDL_LoadBMP("images/BlackQueen.bmp");
+						S_Piece=SDL_LoadBMP("images/BlackQueen.bmp");
 					break;
 				case Knight:
 					if(Board[i][j].GetPieceColor()==White)
-						S_Pieces[i][j]=SDL_LoadBMP("images/WhiteKnight.bmp");
+						S_Piece=SDL_LoadBMP("images/WhiteKnight.bmp");
 					else
-						S_Pieces[i][j]=SDL_LoadBMP("images/BlackKnight.bmp");
+						S_Piece=SDL_LoadBMP("images/BlackKnight.bmp");
 					break;
 				case Pawn:
 					if(Board[i][j].GetPieceColor()==White)
-						S_Pieces[i][j]=SDL_LoadBMP("images/WhitePawn.bmp");
+						S_Piece=SDL_LoadBMP("images/WhitePawn.bmp");
 					else
-						S_Pieces[i][j]=SDL_LoadBMP("images/BlackPawn.bmp");
+						S_Piece=SDL_LoadBMP("images/BlackPawn.bmp");
 					break;
+				default:
+					continue;
 			}
-		}
-	}
-	
-	for(int i=1;i<=8;i++){//change the black ones to white so they are visible
-		for(int j=1;j<=8;j++){
 			if((i==1||i==3||i==5||i==7)&&(j==2||j==4||j==6||j==8)){
-				G_BlackToWhite(S_Pieces[i][j]);
+				G_BlackToWhite(S_Piece);
 			}
 			if((i==2||i==4||i==6||i==8)&&(j==1||j==3||j==5||j==7)){
-				G_BlackToWhite(S_Pieces[i][j]);
+				G_BlackToWhite(S_Piece);
 			}
-		}
-	}
-	
-	SDL_Rect Rect;
-	
-	for(int i=1;i<=8;i++){//blitsit
-		for(int j=1;j<=8;j++){
 			Rect.x=(79*(i-1));
 			Rect.y=(79*(j-1));
-			SDL_BlitSurface(S_Pieces[i][j],NULL,S_Screen,&Rect);
+			SDL_BlitSurface(S_Piece,NULL,S_Screen,&Rect);
 		}
 	}
-	SDL_UpdateWindowSurface(Window)
-	
+	SDL_UpdateWindowSurface(Window);
 }
 
 

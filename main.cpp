@@ -8,7 +8,10 @@ int main(int argc,char* argv[]){
 	string Input1;
 	string Input2;
 	while(!(ChessGame.BlackInCheckMate()||ChessGame.WhiteInCheckMate())){
+		ChessGame.UpdateScreen();
 		ChessGame.PrintChessBoard();
+		SDL_Delay(10000);
+		return 0;
 		cout<<"make a, make a, make a, move"<<ChessGame.GetWhoseTurn()<<endl;
 		cout<<"enter row of the piece"<<endl;
 		cin>>R1;
