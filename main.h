@@ -1,9 +1,12 @@
 #include<iostream>
 #include<string>
 #include<cmath>
+#include<SDL2/SDL.h>
 
 #ifndef _AJEDREZ_MAIN_H_
 #define _AJEDREZ_MAIN_H_
+const int G_Screen_Width=640;
+const int G_Screen_Height=480;
 
 enum G_ChessPiecesColors{White,Black};
 enum G_ChessPiecesTypes{King,Queen,Rook,Bishop,Knight,Pawn,Blank};
@@ -78,6 +81,10 @@ class ChessBoard{
 		G_ChessPiecesColors WhoseTurn=White;
 		int num_of_moves=0;
 		ChessPiece Board[8][8];
+		SDL_Surface* S_Pieces[8][8];
+		SDL_Surface* S_Backgroud;
+		SDL_Window* Window;
+		bool Initialized=false;
 	public:
 		ChessBoard();
 		bool MakeMove(int R1,int C1,int R2,int C2);
@@ -94,6 +101,7 @@ class ChessBoard{
 		bool IsValidMove(int R1,int C1,int R2, int C2);
 		void PrintChessBoard();
 		std::string GetWhoseTurn();
+		void UpdateScreen();//MISSING:implemetation
 };
 ChessBoard::ChessBoard(){//initializes a board with the whites on top and the blacks on the bottom
 	for(int i=1;i<9;i++){
@@ -150,8 +158,37 @@ ChessBoard::ChessBoard(){//initializes a board with the whites on top and the bl
 			}
 		}
 	}
-		
+	//SDL
+	for(int i=1;i<=8;i++){//nullify all pointers
+		for(int j=1;j<=8;j++){
+			S_Pieces[i][j]=NULL;
+		}
 	}
+	S_Background=NULL;
+	Window=NULL;
+	if(SDL_WasInit()==0){//if sdl is not Initialized then initialize it
+		if(SDL_Init(SDL_INIT_EVERYTHING)!=0){
+			std::cout<<"Failed to initialize game"<<std::endl<<SDL_GetError()<<std::endl;
+			Initialized=false;
+		}
+		else
+			Initialized=true;
+	}
+	Window=SDL_CreateWindow(
+		"Chess",
+		SDL_WINDOWPOS_UNDEFINED,
+		SDL_WINDOWPOS_UNDEFINED,
+		G_Screen_Width,
+		G_Screen_Height,
+		SDL_WINDOW_RESIZABLE
+	)
+	if(Window==NULL)
+		Initialized=false;
+	//MISSING:i have to make the S_Backgroud a ChessBoard
+	
+}
+
+
 
 bool ChessBoard::PawnValidMove(int R1,int C1,int R2,int C2){
 	//check that its in fact a pawn in that place
@@ -632,5 +669,28 @@ std::string ChessBoard::GetWhoseTurn(){
 	else
 		return "black";
 }
+
+
+
+
+
+
+
+//sdl part:
+
+void ChessBoard::UpdateScreen(){
+	//MISSING:this function should update de the surfaces and windows so that they display de current state of the board
+	
+	
+}
+
+
+
+
+
+
+
+
+
 #endif
 
