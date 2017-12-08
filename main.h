@@ -5,12 +5,32 @@
 
 #ifndef _AJEDREZ_MAIN_H_
 #define _AJEDREZ_MAIN_H_
-const int G_Screen_Width=640;
-const int G_Screen_Height=480;
+const int G_Screen_Width=626;
+const int G_Screen_Height=626;
 
 enum G_ChessPiecesColors{White,Black};
 enum G_ChessPiecesTypes{King,Queen,Rook,Bishop,Knight,Pawn,Blank};
 
+
+void G_BlackToWhite(SDL_Surface* surface){
+	
+	uint32_t *pixels = (uint32_t*)surface->pixels;
+	int pixelnum=surface->w*surface->h;
+	for(int i=0;i<pixelnum;i++){
+		
+		uint8_t r;
+		uint8_t g;
+		uint8_t b;
+		uint8_t a;
+		
+		uint32_t pixel = *((uint32_t *)surface->pixels + i);
+		SDL_GetRGBA(pixel, surface->format, &r, &g, &b,&a);
+		if(a!=0)
+		{
+			pixels[i] = SDL_MapRGB(surface->format, 255, 255, 255);
+		}
+	}
+}
 
 
 class ChessPiece {
@@ -82,11 +102,13 @@ class ChessBoard{
 		int num_of_moves=0;
 		ChessPiece Board[8][8];
 		SDL_Surface* S_Pieces[8][8];
-		SDL_Surface* S_Backgroud;
+		SDL_Surface* S_Background;
+		SDL_Surface* S_Screen;
 		SDL_Window* Window;
 		bool Initialized=false;
 	public:
 		ChessBoard();
+		~ChessBoard();
 		bool MakeMove(int R1,int C1,int R2,int C2);
 		bool PawnValidMove(int R1,int C1,int R2,int C2);
 		bool KingValidMove(int R1,int C1,int R2,int C2);
@@ -165,8 +187,9 @@ ChessBoard::ChessBoard(){//initializes a board with the whites on top and the bl
 		}
 	}
 	S_Background=NULL;
+	S_Screen=NULL;
 	Window=NULL;
-	if(SDL_WasInit()==0){//if sdl is not Initialized then initialize it
+	if(SDL_WasInit(SDL_INIT_EVERYTHING)==0){//if sdl is not Initialized then initialize it
 		if(SDL_Init(SDL_INIT_EVERYTHING)!=0){
 			std::cout<<"Failed to initialize game"<<std::endl<<SDL_GetError()<<std::endl;
 			Initialized=false;
@@ -181,11 +204,23 @@ ChessBoard::ChessBoard(){//initializes a board with the whites on top and the bl
 		G_Screen_Width,
 		G_Screen_Height,
 		SDL_WINDOW_RESIZABLE
-	)
+	);
 	if(Window==NULL)
 		Initialized=false;
-	//MISSING:i have to make the S_Backgroud a ChessBoard
-	
+	S_Screen=SDL_GetWindowSurface(Window);
+	S_Background=SDL_LoadBMP("images/ChessBoard.bmp");
+	SDL_BlitSurface(S_Background,NULL,S_Screen,NULL);
+	SDL_UpdateWindowSurface(Window);
+}
+ChessBoard::~ChessBoard(){
+	for(int i=1;i<=8;i++){//nullify all pointers
+		for(int j=1;j<=8;j++){
+			SDL_FreeSurface(S_Pieces[i][j]);
+		}
+	}
+	SDL_FreeSurface(S_Background);
+	SDL_FreeSurface(S_Screen);
+	SDL_Quit();
 }
 
 
@@ -680,7 +715,70 @@ std::string ChessBoard::GetWhoseTurn(){
 
 void ChessBoard::UpdateScreen(){
 	//MISSING:this function should update de the surfaces and windows so that they display de current state of the board
+	for(int i=1;i<=8;i++){//put the correct image in each surface
+		for(int j=1;j<=8;j++){
+			switch(Board[i][j].GetPieceType()){
+				case Rook:
+					if(Board[i][j].GetPieceColor()==White)
+						S_Pieces[i][j]=SDL_LoadBMP("images/WhiteRook.bmp");
+					else
+						S_Pieces[i][j]=SDL_LoadBMP("images/BlackRook.bmp");
+					break;
+				case King:
+					if(Board[i][j].GetPieceColor()==White)
+						S_Pieces[i][j]=SDL_LoadBMP("images/WhiteKing.bmp");
+					else
+						S_Pieces[i][j]=SDL_LoadBMP("images/BlackKing.bmp");
+					break;
+				case Bishop:
+					if(Board[i][j].GetPieceColor()==White)
+						S_Pieces[i][j]=SDL_LoadBMP("images/WhiteBishop.bmp");
+					else
+						S_Pieces[i][j]=SDL_LoadBMP("images/BlackBishop.bmp");
+					break;
+				case Queen:
+					if(Board[i][j].GetPieceColor()==White)
+						S_Pieces[i][j]=SDL_LoadBMP("images/WhiteQueen.bmp");
+					else
+						S_Pieces[i][j]=SDL_LoadBMP("images/BlackQueen.bmp");
+					break;
+				case Knight:
+					if(Board[i][j].GetPieceColor()==White)
+						S_Pieces[i][j]=SDL_LoadBMP("images/WhiteKnight.bmp");
+					else
+						S_Pieces[i][j]=SDL_LoadBMP("images/BlackKnight.bmp");
+					break;
+				case Pawn:
+					if(Board[i][j].GetPieceColor()==White)
+						S_Pieces[i][j]=SDL_LoadBMP("images/WhitePawn.bmp");
+					else
+						S_Pieces[i][j]=SDL_LoadBMP("images/BlackPawn.bmp");
+					break;
+			}
+		}
+	}
 	
+	for(int i=1;i<=8;i++){//change the black ones to white so they are visible
+		for(int j=1;j<=8;j++){
+			if((i==1||i==3||i==5||i==7)&&(j==2||j==4||j==6||j==8)){
+				G_BlackToWhite(S_Pieces[i][j]);
+			}
+			if((i==2||i==4||i==6||i==8)&&(j==1||j==3||j==5||j==7)){
+				G_BlackToWhite(S_Pieces[i][j]);
+			}
+		}
+	}
+	
+	SDL_Rect Rect;
+	
+	for(int i=1;i<=8;i++){//blitsit
+		for(int j=1;j<=8;j++){
+			Rect.x=(79*(i-1));
+			Rect.y=(79*(j-1));
+			SDL_BlitSurface(S_Pieces[i][j],NULL,S_Screen,&Rect);
+		}
+	}
+	SDL_UpdateWindowSurface(Window)
 	
 }
 
