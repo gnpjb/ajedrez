@@ -3,6 +3,7 @@
 using namespace std;
 
 int main(int argc,char* argv[]){
+	SDL_Init(SDL_INIT_EVERYTHING);
 	ChessBoard ChessGame;
 	int R1,R2,C1,C2;
 	string Input1;
@@ -10,8 +11,6 @@ int main(int argc,char* argv[]){
 	while(!(ChessGame.BlackInCheckMate()||ChessGame.WhiteInCheckMate())){
 		ChessGame.UpdateScreen();
 		ChessGame.PrintChessBoard();
-		SDL_Delay(10000);
-		return 0;
 		cout<<"make a, make a, make a, move"<<ChessGame.GetWhoseTurn()<<endl;
 		cout<<"enter row of the piece"<<endl;
 		cin>>R1;
@@ -36,4 +35,5 @@ int main(int argc,char* argv[]){
 		cout<<"something went wrong"<<endl;
 		return 1;
 	}
+	SDL_Quit();
 }

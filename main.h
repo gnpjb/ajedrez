@@ -212,7 +212,6 @@ ChessBoard::ChessBoard(){//initializes a board with the whites on top and the bl
 ChessBoard::~ChessBoard(){
 	SDL_FreeSurface(S_Screen);
 	SDL_DestroyWindow(Window);
-	SDL_Quit();
 }
 
 
@@ -706,6 +705,11 @@ std::string ChessBoard::GetWhoseTurn(){
 //sdl part:
 
 void ChessBoard::UpdateScreen(){
+	SDL_Surface* S_Background=NULL;
+	S_Background=SDL_LoadBMP("images/chessboard.bmp");
+	SDL_BlitSurface(S_Background,NULL,S_Screen,NULL);
+	SDL_UpdateWindowSurface(Window);
+	SDL_FreeSurface(S_Background);
 	SDL_Surface* S_Piece=NULL;
 	SDL_Rect Rect;
 	for(int i=0;i<8;i++){//put the correct image in each surface
@@ -766,6 +770,7 @@ void ChessBoard::UpdateScreen(){
 			SDL_BlitSurface(S_Piece,NULL,S_Screen,&Rect);
 		}
 	}
+	SDL_FreeSurface(S_Piece);
 	SDL_UpdateWindowSurface(Window);
 }
 
