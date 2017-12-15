@@ -708,41 +708,44 @@ std::string ChessBoard::GetWhoseTurn(){
 void ChessBoard::UpdateScreen(){
 	SDL_Surface* S_Piece=NULL;
 	SDL_Rect Rect;
-	for(int i=1;i<=8;i++){//put the correct image in each surface
-		for(int j=1;j<=8;j++){
-			switch(Board[i][j].GetPieceType()){
+	for(int i=0;i<8;i++){//put the correct image in each surface
+		for(int j=0;j<8;j++){
+			G_ChessPiecesTypes type = Board[i][j].GetPieceType();
+			G_ChessPiecesColors color = Board[i][j].GetPieceColor();
+			switch(type){
 				case Rook:
-					if(Board[i][j].GetPieceColor()==White)
+					if(color==White) {
 						S_Piece=SDL_LoadBMP("images/WhiteRook.bmp");
-					else
+					} else {
 						S_Piece=SDL_LoadBMP("images/BlackRook.bmp");
+					}
 					break;
 				case King:
-					if(Board[i][j].GetPieceColor()==White)
+					if(color==White){
 						S_Piece=SDL_LoadBMP("images/WhiteKing.bmp");
-					else
+					}else{
 						S_Piece=SDL_LoadBMP("images/BlackKing.bmp");
-					break;
+					}break;
 				case Bishop:
-					if(Board[i][j].GetPieceColor()==White)
+					if(color==White)
 						S_Piece=SDL_LoadBMP("images/WhiteBishop.bmp");
 					else
 						S_Piece=SDL_LoadBMP("images/BlackBishop.bmp");
 					break;
 				case Queen:
-					if(Board[i][j].GetPieceColor()==White)
+					if(color==White)
 						S_Piece=SDL_LoadBMP("images/WhiteQueen.bmp");
 					else
 						S_Piece=SDL_LoadBMP("images/BlackQueen.bmp");
 					break;
 				case Knight:
-					if(Board[i][j].GetPieceColor()==White)
+					if(color==White)
 						S_Piece=SDL_LoadBMP("images/WhiteKnight.bmp");
 					else
 						S_Piece=SDL_LoadBMP("images/BlackKnight.bmp");
 					break;
 				case Pawn:
-					if(Board[i][j].GetPieceColor()==White)
+					if(color==White)
 						S_Piece=SDL_LoadBMP("images/WhitePawn.bmp");
 					else
 						S_Piece=SDL_LoadBMP("images/BlackPawn.bmp");
@@ -750,14 +753,16 @@ void ChessBoard::UpdateScreen(){
 				default:
 					continue;
 			}
-			if((i==1||i==3||i==5||i==7)&&(j==2||j==4||j==6||j==8)){
+			if((i==0||i==2||i==4||i==6)&&(j==1||j==3||j==5||j==7)){
 				G_BlackToWhite(S_Piece);
 			}
-			if((i==2||i==4||i==6||i==8)&&(j==1||j==3||j==5||j==7)){
+			if((i==1||i==3||i==5||i==7)&&(j==0||j==2||j==4||j==6)){
 				G_BlackToWhite(S_Piece);
 			}
-			Rect.x=(79*(i-1));
-			Rect.y=(79*(j-1));
+			int x = 79 * i;
+			int y = 79 * j;
+			Rect.x=x;
+			Rect.y=y;
 			SDL_BlitSurface(S_Piece,NULL,S_Screen,&Rect);
 		}
 	}
