@@ -759,8 +759,8 @@ void ChessBoard::UpdateScreen(){
 			if((i==1||i==3||i==5||i==7)&&(j==0||j==2||j==4||j==6)){
 				G_BlackToWhite(S_Piece);
 			}
-			int x = 79 * i;
-			int y = 79 * j;
+			int x = 79 * j;
+			int y = 79 * i;
 			Rect.x=x;
 			Rect.y=y;
 			SDL_BlitSurface(S_Piece,NULL,S_Screen,&Rect);
