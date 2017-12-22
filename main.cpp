@@ -22,6 +22,8 @@ int main(int argc,char* argv[]){
 		cin>>C2;
 		ChessGame.MakeMove(R1,C1,R2,C2);
 		cout<<endl<<R1<<R2<<C1<<C2<<endl;
+		if(R1==10)
+			return 1	;
 	}
 	if(ChessGame.WhiteInCheckMate()){
 		cout<<"white has lost"<<endl;

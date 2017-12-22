@@ -701,10 +701,9 @@ std::string ChessBoard::GetWhoseTurn(){
 
 void ChessBoard::UpdateScreen(){
 	SDL_Surface* S_Background=NULL;
-	S_Background=SDL_LoadBMP("images/chessboard.bmp");
+	S_Background=SDL_LoadBMP("images/ChessBoard.bmp");
 	SDL_BlitSurface(S_Background,NULL,S_Screen,NULL);
-	SDL_UpdateWindowSurface(Window);
-	SDL_FreeSurface(S_Background);
+	SDL_UpdateWindowSurface(Window);;
 	SDL_Surface* S_Piece=NULL;
 	SDL_Rect Rect;
 	for(int i=0;i<8;i++){//put the correct image in each surface
@@ -766,6 +765,7 @@ void ChessBoard::UpdateScreen(){
 		}
 	}
 	SDL_FreeSurface(S_Piece);
+	SDL_FreeSurface(S_Background);
 	SDL_UpdateWindowSurface(Window);
 }
 
