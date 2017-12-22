@@ -188,7 +188,7 @@ bool ChessBoard::PawnValidMove(int R1,int C1,int R2,int C2){
 		if(Board[R1-1][C1-1].GetPieceColor()==White)
 			return false;
 	}
-	{
+	if(C1==C2){
 		int Dir;//direction of move
 		if((R1-R2)>0)
 			Dir=(-1);
@@ -206,8 +206,7 @@ bool ChessBoard::PawnValidMove(int R1,int C1,int R2,int C2){
 	}
 	return true;
 }
-
-
+// im here<-------------------------------------------------
 
 bool ChessBoard::KingValidMove(int R1,int C1,int R2,int C2){
 	//check that its in fact a king in that place
