@@ -769,5 +769,34 @@ void ChessBoard::UpdateScreen(){
 	SDL_UpdateWindowSurface(Window);
 }
 
+int SquareDeduction(float Num){
+	if(Num>=0&&Num<=79){
+		return 1;
+	}
+	if(Num>79&&Num<=158){
+		return 2;
+	}
+	if(Num>158&&Num<=237){
+		return 3;
+	}
+	if(Num>237&&Num<314){
+		return 4;
+	}
+	if(Num>=314&&Num<393){
+		return 5;
+	}
+	if(Num>=393&&Num<=472){
+		return 6;
+	}
+	if(Num>=472&&Num<=571){
+		return 7;
+	}
+	if(Num>=571&&Num<626){
+		return 8;
+	}
+	
+	
+	
+}
 #endif
 

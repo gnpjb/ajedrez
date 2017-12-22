@@ -6,24 +6,44 @@ int main(int argc,char* argv[]){
 	SDL_Init(SDL_INIT_EVERYTHING);
 	ChessBoard ChessGame;
 	int R1,R2,C1,C2;
-	string Input1;
-	string Input2;
-	while(!(ChessGame.BlackInCheckMate()||ChessGame.WhiteInCheckMate())){
+	bool Quit=false;
+	SDL_Event Action;
+	uint32_t FPS_Ticker;
+	while(true){
+		FPS_Ticker=SDL_GetTicks();
 		ChessGame.UpdateScreen();
-		ChessGame.PrintChessBoard();
-		cout<<"make a, make a, make a, move"<<ChessGame.GetWhoseTurn()<<endl;
-		cout<<"enter row of the piece"<<endl;
-		cin>>R1;
-		cout<<"enter column of the piece"<<endl;
-		cin>>C1;
-		cout<<"enter row to move to"<<endl;
-		cin>>R2;
-		cout<<"enter column to move to"<<endl;
-		cin>>C2;
+		if((ChessGame.BlackInCheckMate()||ChessGame.WhiteInCheckMate())){
+			break;
+		}
+		SDL_WaitEvent(&Action);
+		if(Action.type==SDL_QUIT){
+			Quit=true;
+		}
+		if(Action.type==SDL_MOUSEBUTTONDOWN){
+			R1=SquareDeduction(Action.button.y);
+			C1=SquareDeduction(Action.button.x);
+			cout<<"R1,C1="<<R1<<","<<C1<<endl;
+			while(true){
+				SDL_WaitEvent(&Action);
+				if(Action.type==SDL_QUIT){
+					Quit=true;
+					break;
+				}
+				if(Action.type==SDL_MOUSEBUTTONDOWN){
+					R2=SquareDeduction(Action.button.y);
+					C2=SquareDeduction(Action.button.x);
+					cout<<"R2,C2="<<R2<<","<<C2<<endl;
+					break;
+				}
+			}
+			
+			
+		}
+		if(Quit==true){
+			cout<<"Quitting"<<endl;
+			break;
+		}
 		ChessGame.MakeMove(R1,C1,R2,C2);
-		cout<<endl<<R1<<R2<<C1<<C2<<endl;
-		if(R1==10)
-			return 1	;
 	}
 	if(ChessGame.WhiteInCheckMate()){
 		cout<<"white has lost"<<endl;
